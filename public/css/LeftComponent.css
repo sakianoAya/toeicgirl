@@ -1,0 +1,14 @@
+.left-column {
+    flex: 7; /* 左側區域占 2/5 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f3f4f6; /* 左側背景色 */
+  }
+  
+  .character-image {
+    max-width: 50%; /* 限制圖片大小 */
+    height: auto;
+    object-fit: contain;
+  }
+  

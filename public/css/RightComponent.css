@@ -1,0 +1,8 @@
+.right-column {
+    flex: 3; /* 右側區域占 3/5 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000; /* 右側背景色 */
+  }
+  
