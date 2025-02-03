@@ -1,8 +1,8 @@
-// LeftComponent.jsx
+// LeftComponent.tsx
 import React from "react";
 import "./LeftComponent.css";
 
-export default function LeftComponent() {
+const LeftComponent: React.FC = () => {
   return (
     <div className="left-column">
       <img
@@ -12,4 +12,6 @@ export default function LeftComponent() {
       />
     </div>
   );
-}
+};
+
+export default LeftComponent;

@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import "./TabComponent.css"; // 引入樣式
-import axios from 'axios';
-import VocabularyList from "./VocabularyList";
+import "./TabComponent.css";  // CSSパスを修正
+import ToeicListComponent from "./ToeicListComponent";
 
-
-const TabComponent = () => {
+const TabComponent: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = ["チャレンジ", "リスト", "ノート"];
 
   const tabContent = [
     <div>挑戰模式的內容</div>,
-    <VocabularyList />, // 單字列表委派給 VocabularyList
+    <div><ToeicListComponent /></div>, // 單字列表
     <div>筆記功能的內容</div>,
   ];
 

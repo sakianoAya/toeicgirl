@@ -1,0 +1,21 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"  // SQLite 資料庫
+}
+
+model Toeiclist {
+  id        Int     @id @default(autoincrement())  // 自動遞增 ID
+  words     String  // 單字
+  class     String  // 詞性
+  japanese  String  // 日文翻譯
+  sentence  String  // 例句
+  level     String  // 等級
+  userNotes String? // 用戶筆記 (可選)
+  category  String  // 類別
+}
+

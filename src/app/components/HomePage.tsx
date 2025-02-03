@@ -1,10 +1,10 @@
-// HomePage.jsx
+// HomePage.tsx
 import React from "react";
 import "./HomePage.css";
 import LeftComponent from "./LeftComponent/LeftComponent";
 import RightComponent from "./RightComponent/RightComponent";
 
-export default function HomePage() {
+const HomePage: React.FC = () => {
   return (
     <div className="container">
       {/* 左側組件 */}
@@ -13,4 +13,6 @@ export default function HomePage() {
       <RightComponent />
     </div>
   );
-}
+};
+
+export default HomePage;
