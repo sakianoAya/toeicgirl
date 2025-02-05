@@ -17,5 +17,17 @@ model Toeiclist {
   level     String  // 等級
   userNotes String? // 用戶筆記 (可選)
   category  String  // 類別
+
+  notes     Note[]  // ✅ 新增這行，建立雙向關聯
 }
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  wordId    Int
+  createdAt DateTime @default(now())
+
+  word      Toeiclist @relation(fields: [wordId], references: [id]) // 連接到 Toeiclist
+}
+
 
