@@ -3,7 +3,17 @@ import React, { useEffect, useState } from "react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 const ToeicListComponent: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
+  interface ToeicItem {
+    id: number;
+    words: string;
+    japanese: string;
+    class: string;
+    sentence: string;
+    level: string;
+    category: string;
+  }
+
+  const [data, setData] = useState<ToeicItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,10 +50,10 @@ const ToeicListComponent: React.FC = () => {
           
           {/* 展開後顯示更多資訊 */}
           <AccordionContent>
-            <p><strong>詞性：</strong> {item.class}</p>
-            <p><strong>例句：</strong> {item.sentence}</p>
-            <p><strong>難度：</strong> {item.level}</p>
-            <p><strong>分類：</strong> {item.category}</p>
+            <p><strong>品詞：</strong> {item.class}</p>
+            <p><strong>例文：</strong> {item.sentence}</p>
+            <p><strong>難易度：</strong> {item.level}</p>
+            <p><strong>カテゴリー：</strong> {item.category}</p>
           </AccordionContent>
         </AccordionItem>
       ))}

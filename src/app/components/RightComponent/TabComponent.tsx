@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./TabComponent.css";  // CSSパスを修正
 import ToeicListComponent from "./ToeicListComponent";
-import { ListComponent } from "./ListComponent";
 import ChallengeComponent from "./ChallengeComponent";
+import NotesList from "./NotesList";
 
 const TabComponent: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -10,9 +10,9 @@ const TabComponent: React.FC = () => {
   const tabs = ["チャレンジ", "リスト", "ノート"];
 
   const tabContent = [
-    <div><ChallengeComponent/></div>,
-    <div><ToeicListComponent /></div>, // 單字列表
-    <div>筆記功能的內容</div>,
+    <div key="challenge"><ChallengeComponent/></div>,
+    <div key="toeic-list"><ToeicListComponent /></div>, // 單字列表
+    <div key="notes-list"><NotesList/></div>,
   ];
 
   return (
