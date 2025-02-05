@@ -12,7 +12,6 @@ const App: React.FC = () => {
   return (
     <div>
       <HomePage />
-      <div>Count: {count}</div>
     </div>
   );
 };
