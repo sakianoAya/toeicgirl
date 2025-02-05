@@ -1,5 +1,6 @@
 "use client"; // 必須加這行，讓組件在前端執行
 import React, { useEffect, useState } from "react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 const ToeicListComponent: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
@@ -9,7 +10,7 @@ const ToeicListComponent: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("../../api/toeiclist"); // 呼叫 API
+        const response = await fetch("/api/toeiclist"); // API 路徑修正
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -29,32 +30,24 @@ const ToeicListComponent: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
-      <table border={1}>
-        <thead>
-          <tr>
-            <th>Word</th>
-            <th>Class</th>
-            <th>Japanese</th>
-            <th>Sentence</th>
-            <th>Level</th>
-            <th>Category</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item) => (
-            <tr key={item.id}>
-              <td>{item.words}</td>
-              <td>{item.class}</td>
-              <td>{item.japanese}</td>
-              <td>{item.sentence}</td>
-              <td>{item.level}</td>
-              <td>{item.category}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Accordion type="single" collapsible>
+      {data.map((item) => (
+        <AccordionItem key={item.id} value={`item-${item.id}`}>
+          {/* 這裡顯示 英文 - 日文 */}
+          <AccordionTrigger>
+            <span className="font-medium">{item.words}</span> - <span className="text-gray-500">{item.japanese}</span>
+          </AccordionTrigger>
+          
+          {/* 展開後顯示更多資訊 */}
+          <AccordionContent>
+            <p><strong>詞性：</strong> {item.class}</p>
+            <p><strong>例句：</strong> {item.sentence}</p>
+            <p><strong>難度：</strong> {item.level}</p>
+            <p><strong>分類：</strong> {item.category}</p>
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   );
 };
 
