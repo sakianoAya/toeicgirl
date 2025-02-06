@@ -4,9 +4,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"  // SQLite 資料庫
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
+
 
 model Toeiclist {
   id        Int     @id @default(autoincrement())  // 自動遞增 ID
@@ -17,7 +19,6 @@ model Toeiclist {
   level     String  // 等級
   userNotes String? // 用戶筆記 (可選)
   category  String  // 類別
-
   notes     Note[]  // ✅ 新增這行，建立雙向關聯
 }
 

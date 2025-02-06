@@ -1,4 +1,4 @@
-"use client"; // 必須加這行，讓組件在前端執行
+// "use client"; // 必須加這行，讓組件在前端執行
 import React, { useEffect, useState } from "react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
