@@ -3,12 +3,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// 取得所有筆記
+
 export async function GET() {
   try {
     const notes = await prisma.note.findMany({
       include: {
-        word: true, // 取得關聯的 Toeiclist 單字
+        word: true, 
       },
     });
     return NextResponse.json(notes);
@@ -18,7 +18,7 @@ export async function GET() {
   }
 }
 
-// 新增筆記
+
 export async function POST(req: Request) {
   try {
     const { userId, wordId } = await req.json();
@@ -41,7 +41,6 @@ export async function POST(req: Request) {
   }
 }
 
-// 刪除筆記
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
