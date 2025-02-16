@@ -11,7 +11,7 @@ const TabComponent: React.FC = () => {
 
   const tabContent = [
     <div key="challenge"><ChallengeComponent/></div>,
-    <div key="toeic-list"><ToeicListComponent /></div>, // 單字列表
+    <div key="toeic-list"><ToeicListComponent /></div>, 
     <div key="notes-list"><NotesList/></div>,
   ];
 
@@ -22,7 +22,7 @@ const TabComponent: React.FC = () => {
           <button
             key={index}
             className={`tab-button ${activeTab === index ? "active" : ""}`}
-            onClick={() => setActiveTab(index)}
+            onClick={() => setActiveTab(index)}// タブをクリックしたときの処理
           >
             {tab}
           </button>

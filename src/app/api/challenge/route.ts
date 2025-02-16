@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient(); // 直接建立 PrismaClient
+const prisma = new PrismaClient(); // 直接PrismaClientを作成
 
 export async function GET() {
   try {
-    // 從資料庫取得所有單字
+    // データベースからすべての単語を取得
     const words = await prisma.toeiclist.findMany();
 
-    // 隨機選取 10 個單字
+    // ランダムに10個の単語を選択
     const selectedWords = words.sort(() => 0.5 - Math.random()).slice(0, 10);
 
-    // 生成測驗題目
+    // クイズの問題を生成
     const quiz = selectedWords.map((word) => {
-      const isEnglishToJapanese = Math.random() > 0.5; // 隨機決定顯示日文或英文
+      const isEnglishToJapanese = Math.random() > 0.5; // ランダムに日本語か英語を表示
       const correctAnswer = isEnglishToJapanese ? word.japanese : word.words;
 
-      // 生成選項
+      // 選択肢を生成
       let choices = [correctAnswer];
 
       while (choices.length < 4) {
@@ -27,7 +27,7 @@ export async function GET() {
         }
       }
 
-      // 隨機排序選項
+      // 選択肢をシャッフル
       choices = choices.sort(() => Math.random() - 0.5);
 
       return {

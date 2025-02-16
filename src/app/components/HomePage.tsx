@@ -7,9 +7,9 @@ import RightComponent from "./RightComponent/RightComponent";
 const HomePage: React.FC = () => {
   return (
     <div className="container">
-      {/* 左側組件 */}
+      {/* 左 */}
       <LeftComponent />
-      {/* 右側組件 */}
+      {/* 右*/}
       <RightComponent />
     </div>
   );

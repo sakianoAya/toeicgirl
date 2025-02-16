@@ -17,8 +17,9 @@ const NotesList: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingNote, setDeletingNote] = useState<number | null>(null);
 
-  // 取得筆記
+  // ノートを取得
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -38,6 +39,33 @@ const NotesList: React.FC = () => {
     fetchNotes();
   }, []);
 
+  // ノートを削除
+  const handleDeleteNote = async (noteId: number) => {
+  if (!confirm("このメモを削除してもよろしいですか？")) return;
+
+  setDeletingNote(noteId);
+  try {
+    const response = await fetch(`/api/notes`, {  
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: noteId }),  
+    });
+
+    if (!response.ok) {
+      throw new Error("削除に失敗しました");
+    }
+
+    alert("メモが削除されました！");
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  } catch (error) {
+    alert("メモの削除中にエラーが発生しました");
+    console.error(error);
+  } finally {
+    setDeletingNote(null);
+  }
+};
+
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -53,6 +81,12 @@ const NotesList: React.FC = () => {
             </AccordionTrigger>
             <AccordionContent>
               <p className="text-gray-700">{note.word.sentence}</p>
+                <button
+                onClick={() => handleDeleteNote(note.id)}
+                className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                >
+                メモを削除
+                </button>
             </AccordionContent>
           </AccordionItem>
         ))
