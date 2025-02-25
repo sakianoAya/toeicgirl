@@ -74,14 +74,19 @@ const PixiSpine = () => {
       console.log('offset:', offset);
       console.log('bound:', bound);
       console.log('Skeleton:', spineGirl.skeleton);
+     console.log("Scale:", spineGirl.spine.scale);
+        console.log("Position:", spineGirl.view.x, spineGirl.view.y);
+
     
 
 
       
       setupInput();
       app.ticker.add(() => {
+        
         if (mouseMoved) {
           calculateBlend(clientMouseX, clientMouseY, left, right, up, down, spineGirl);
+          
         }
       });
       

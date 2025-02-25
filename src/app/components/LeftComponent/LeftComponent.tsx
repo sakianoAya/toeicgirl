@@ -6,7 +6,8 @@ import Image from "next/image";
 // import SpineAnimation from "./ExampleSpine";
 import PixiSpine from "./SpineAnimation"
 import OwlSpine from "./owlTest";
-
+import SpineCanvas from "./ExampleSpine";
+// import PixiSpine from "./PixiSpine";
 
 
 
