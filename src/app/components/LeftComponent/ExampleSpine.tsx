@@ -1,111 +1,123 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as spine from "@esotericsoftware/spine-webgl";
 
+const SpineCanvas = () => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const spineApp = useRef<any>(null);
 
+    useEffect(() => {
+        if (!canvasRef.current) return;
 
-interface SpineAnimationProps {
-  atlasPath: string;
-  jsonPath: string;
-  animation: string;
-  scale?: number;
-  width?: number;
-  height?: number;
-}
+        class App {
+            skeleton: any;
+            animationState: any;
+            draggableBones: any[] = [];
+            selectedBone: any = null;
+            nonRotatableBones = ["Face_CT"]; // ❌ 這些骨骼不能旋轉
 
-const SpineAnimation: React.FC<SpineAnimationProps> = ({
-  atlasPath,
-  jsonPath,
-  animation,
-  scale = 1,
-  width = 800,
-  height = 600,
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  let gl: WebGLRenderingContext | null;
-  let renderer: spine.SceneRenderer;
-  let assetManager: spine.AssetManager;
-  let skeleton: spine.Skeleton;
-  let state: spine.AnimationState;
-  let timeKeeper = new spine.TimeKeeper();
+            constructor() {
+                this.skeleton = null;
+                this.animationState = null;
+            }
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    gl = canvas.getContext("webgl") as WebGLRenderingContext;
-    if (!gl) {
-      console.error("WebGL not supported.");
-      return;
-    }
+            loadAssets(canvas: any) {
+                canvas.assetManager.loadBinary("https://raw.githubusercontent.com/sakianoAya/spine_assets/main/sora.json");
+                canvas.assetManager.loadTextureAtlas("https://raw.githubusercontent.com/sakianoAya/spine_assets/main/sora.atlas");
+            }
 
-    renderer = new spine.SceneRenderer(canvas, gl);
-    assetManager = new spine.AssetManager(gl, "/spine/");// 這裡設定為 "/spine/"
+            initialize(canvas: any) {
+                let assetManager = canvas.assetManager;
+                let atlas = assetManager.require("https://raw.githubusercontent.com/sakianoAya/spine_assets/main/sora.atlas");
+                let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+                
+                let skeletonJson = new spine.SkeletonJson(atlasLoader);
+                skeletonJson.scale = 0.2; // 確保 Spinal Scale 正確
+                let skeletonData = skeletonJson.readSkeletonData(assetManager.require("https://raw.githubusercontent.com/sakianoAya/spine_assets/main/sora.json"));
 
-    assetManager.loadTextureAtlas(atlasPath);
-    assetManager.loadJson(jsonPath);
+                this.skeleton = new spine.Skeleton(skeletonData);
+                let animationStateData = new spine.AnimationStateData(skeletonData);
+                this.animationState = new spine.AnimationState(animationStateData);
 
-    const checkLoading = setInterval(() => {
-      if (assetManager.isLoadingComplete()) {
-        clearInterval(checkLoading);
-        console.log("✅ 資源載入完成");
-        loadingComplete();
-      }
-    }, 100);
+                // 設定可拖動骨骼
+                let draggableBoneNames = ["Face_CT"];
+                for (let boneName of draggableBoneNames) {
+                    let bone = this.skeleton.findBone(boneName);
+                    if (bone) this.draggableBones.push(bone);
+                }
 
-    return () => clearInterval(checkLoading);
-  }, []);
+                // 滑鼠事件
+                canvas.input.addListener({
+                    down: (x: number, y: number) => {
+                        let mousePosition = new spine.Vector3(x, y);
+                        canvas.renderer.camera.screenToWorld(mousePosition, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
+                        this.selectedBone = null;
 
-  const loadingComplete = () => {
-    const jsonData = assetManager.get(jsonPath);  // 嘗試取得 JSON 資料
-    console.log("JSON 資料:", jsonData);
+                        for (let bone of this.draggableBones) {
+                            if (mousePosition.distance(new spine.Vector3(bone.worldX, bone.worldY, 0)) < 20) {
+                                this.selectedBone = bone;
+                                break;
+                            }
+                        }
+                    },
+                    dragged: (x: number, y: number) => {
+                        if (!this.selectedBone) return;
 
-  if (!jsonData) {
-    console.error("❌ JSON 資料載入失敗:", jsonPath);
-    return;
-  }
-    const atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get(atlasPath));
-    const skeletonJson = new spine.SkeletonJson(atlasLoader);
-    skeletonJson.scale = scale;
-    const skeletonData = skeletonJson.readSkeletonData(assetManager.get(jsonPath));
-    
+                        let mousePosition = new spine.Vector3(x, y);
+                        canvas.renderer.camera.screenToWorld(mousePosition, canvas.htmlCanvas.clientWidth, canvas.htmlCanvas.clientHeight);
 
-    try {
-    const skeletonData = skeletonJson.readSkeletonData(jsonData);
-    skeleton = new spine.Skeleton(skeletonData);
-    state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-    state.setAnimation(0, animation, true);
+                        if (this.selectedBone.parent) {
+                            let position = new spine.Vector2(mousePosition.x, mousePosition.y);
+                            this.selectedBone.parent.worldToLocal(position);
+                            this.selectedBone.x = position.x;
+                            this.selectedBone.y = position.y;
 
-    renderer.camera.position.x = 0;
-    renderer.camera.position.y = 0;
+                            // ❌ 限制旋轉
+                            if (this.nonRotatableBones.includes(this.selectedBone.data.name)) {
+                                this.selectedBone.rotation = 0;
+                            }
+                        } else {
+                            this.selectedBone.x = mousePosition.x;
+                            this.selectedBone.y = mousePosition.y;
+                        }
+                    }
+                });
+            }
 
-    requestAnimationFrame(render);
-  } catch (error) {
-    console.error("❌ Skeleton 加載失敗:", error);
-  }
-  };
+            update(canvas: any, delta: number) {
+                this.animationState.update(delta);
+                this.animationState.apply(this.skeleton);
+                this.skeleton.updateWorldTransform(spine.Physics.update); // Spine 4.2 物理模擬
+            }
 
-  const render = () => {
-    timeKeeper.update();
-    const delta = timeKeeper.delta;
+            render(canvas: any) {
+                let renderer = canvas.renderer;
+                renderer.resize(spine.ResizeMode.Expand);
+                canvas.clear(0.2, 0.2, 0.2, 1);
+                
+                renderer.begin();
+                renderer.drawSkeleton(this.skeleton, true);
 
-    state.update(delta);
-    state.apply(skeleton);
-    skeleton.updateWorldTransform(spine.Physics.update);
+                let boneColor = new spine.Color(1, 0, 0, 0.5);
+                let selectedBoneColor = new spine.Color(0, 1, 0, 0.5);
+                for (let bone of this.draggableBones) {
+                    renderer.circle(true, bone.worldX, bone.worldY, 20, bone === this.selectedBone ? selectedBoneColor : boneColor);
+                }
+                renderer.end();
+            }
+        }
 
-    if (!gl) return;
-    gl.clearColor(0.2, 0.2, 0.2, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+        spineApp.current = new spine.SpineCanvas(canvasRef.current, { app: new App() });
 
-    renderer.begin();
-    renderer.drawSkeleton(skeleton, true);
-    renderer.end();
+        return () => {
+            if (spineApp.current) {
+                spineApp.current.dispose();
+            }
+        };
+    }, []);
 
-    requestAnimationFrame(render);
-  };
-
-  return <canvas ref={canvasRef} width={width} height={height} />;
+    return <canvas ref={canvasRef} style={{  width: "100%", height: "100%" }} />;
 };
 
-export default SpineAnimation;
-
+export default SpineCanvas;
